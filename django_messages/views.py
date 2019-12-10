@@ -10,7 +10,7 @@ try:
 except ImportError:
     from django.urls import reverse
 from django.conf import settings
-
+from tales.emoticons import emoticons
 from django_messages.models import Message
 from django_messages.forms import ComposeForm
 from django_messages.utils import format_quote, get_user_model, get_username_field
@@ -43,7 +43,7 @@ def outbox(request, template_name='django_messages/outbox.html'):
     """
     message_list = Message.objects.outbox_for(request.user)
     return render(request, template_name, {
-        'message_list': message_list,
+        'message_list': message_list, 'icons':emoticons(),
     })
 
 @login_required
@@ -57,7 +57,7 @@ def trash(request, template_name='django_messages/trash.html'):
     """
     message_list = Message.objects.trash_for(request.user)
     return render(request, template_name, {
-        'message_list': message_list,
+        'message_list': message_list,'icons':emoticons(),
     })
 
 @login_required
@@ -98,7 +98,7 @@ def compose(request, recipient=None, form_class=ComposeForm,
             recipients = [u for u in User.objects.filter(**{'%s__in' % get_username_field(): [r.strip() for r in recipient.split('+')]})]
             form.fields['recipient'].initial = recipients
     return render(request, template_name, {
-        'form': form,
+        'form': form,'icons':emoticons(),
     })
 
 @login_required
@@ -134,7 +134,7 @@ def reply(request, message_id, form_class=ComposeForm,
             'recipient': [parent.sender,]
             })
     return render(request, template_name, {
-        'form': form,
+        'form': form,'icons':emoticons(),
     })
 
 @login_required
@@ -230,4 +230,5 @@ def view(request, message_id, form_class=ComposeForm, quote_helper=format_quote,
             'recipient': [message.sender,]
             })
         context['reply_form'] = form
+        context['icons']= emoticons()
     return render(request, template_name, context)
